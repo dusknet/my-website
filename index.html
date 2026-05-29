@@ -2,8 +2,8 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DeepSeek NeoChat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DeepSeek NeoChat Pro</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css">
@@ -13,147 +13,132 @@
         
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #0b0f19;
+            background-color: #05070f;
             color: #f3f4f6;
         }
 
-        /* 自定义美化滚动条 */
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #1f2937;
-            border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #374151;
-        }
+        /* 滚动条精致化 */
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 99px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #334155; }
 
-        /* Markdown 样式精致化 */
-        .markdown-body p { margin-bottom: 0.75rem; line-height: 1.625; }
+        /* Markdown 精致渲染排版 */
+        .markdown-body p { margin-bottom: 0.75rem; line-height: 1.7; color: #cbd5e1; }
         .markdown-body p:last-child { margin-bottom: 0; }
         .markdown-body code {
             background-color: #1e293b;
-            padding: 0.2rem 0.4rem;
-            border-radius: 4px;
-            font-size: 0.875em;
-            font-family: monospace;
+            padding: 0.15rem 0.35rem;
+            border-radius: 6px;
+            font-size: 0.85em;
+            font-family: Menlo, Monaco, Consolas, monospace;
             color: #f43f5e;
         }
         .markdown-body pre {
-            background-color: #111827;
-            padding: 1rem;
-            border-radius: 8px;
+            background-color: #090d16;
+            padding: 1.1rem;
+            border-radius: 10px;
             overflow-x: auto;
-            margin: 0.75rem 0;
-            border: 1px solid #1f2937;
+            margin: 0.8rem 0;
+            border: 1px solid #1e293b;
         }
-        .markdown-body pre code {
-            background-color: transparent;
-            padding: 0;
-            color: inherit;
-            font-size: 0.875rem;
-        }
+        .markdown-body pre code { background-color: transparent; padding: 0; color: #e2e8f0; font-size: 0.85rem; }
 
-        /* 思考动画 */
+        /* 思考打字机动画 */
         .typing-indicator span {
-            animation: blink 1.4s infinite both;
-            display: inline-block;
-            width: 6px;
-            height: 6px;
-            background-color: #9ca3af;
-            border-radius: 50%;
-            margin: 0 2px;
+            animation: blink 1.4s infinite both; display: inline-block;
+            width: 5px; height: 5px; background-color: #64748b; border-radius: 50%; margin: 0 1.5px;
         }
         .typing-indicator span:nth-child(2) { animation-delay: .2s; }
         .typing-indicator span:nth-child(3) { animation-delay: .4s; }
-        @keyframes blink {
-            0% { opacity: .2; }
-            20% { opacity: 1; }
-            100% { opacity: .2; }
-        }
+        @keyframes blink { 0%, 100% { opacity: .2; } 20% { opacity: 1; } }
     </style>
 </head>
-<body class="h-screen w-screen flex justify-center items-center p-0 md:p-6 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/20 via-slate-950 to-slate-950 overflow-hidden">
+<body class="h-screen w-screen flex justify-center items-center p-0 md:p-5 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-950/30 via-slate-950 to-slate-950 overflow-hidden select-none">
 
-    <div class="w-full max-w-6xl h-full md:h-[90vh] bg-slate-900/70 backdrop-blur-xl border border-slate-800 md:rounded-2xl shadow-2xl flex overflow-hidden">
+    <div class="w-full max-w-7xl h-full md:h-[92vh] bg-slate-900/60 backdrop-blur-2xl border border-slate-800/80 md:rounded-2xl shadow-2xl flex overflow-hidden relative">
         
-        <aside id="sidebar" class="hidden md:flex flex-col w-64 bg-slate-950/95 border-r border-slate-800/60 h-full transition-all flex-shrink-0">
-            <div class="p-4 border-b border-slate-800/60">
-                <button onclick="createNewSession()" class="w-full py-2 px-4 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-2 shadow-lg shadow-blue-900/20 cursor-pointer">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                    </svg>
-                    <span>开启新对话</span>
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-950/95 border-r border-slate-800/80 h-full flex flex-col transform -translate-x-full transition-transform duration-300 ease-in-out md:relative md:translate-x-0 flex-shrink-0">
+            <div class="p-4 border-b border-slate-900">
+                <button onclick="createNewSession()" class="w-full py-2.5 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl text-xs font-semibold transition-all flex items-center justify-center space-x-2 shadow-lg shadow-blue-500/10 cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>
+                    <span>开启全新对话</span>
                 </button>
             </div>
+            
             <div id="sessionList" class="flex-1 overflow-y-auto p-2 space-y-1 custom-scrollbar"></div>
-            <div class="p-3 border-t border-slate-800/60 text-[10px] text-slate-500 text-center tracking-wider">
-                最近聊天记录 (数据纯本地安全存储)
+            
+            <div class="p-3.5 border-t border-slate-900 flex justify-between items-center text-[10px] text-slate-500 tracking-wider bg-slate-950/40">
+                <span>深色极客模式开启</span>
+                <span id="globalTokenBadge" class="px-1.5 py-0.5 rounded bg-slate-900 text-slate-400 font-mono">0 Session</span>
             </div>
         </aside>
 
-        <div class="flex-1 flex flex-col h-full overflow-hidden relative">
+        <div class="flex-1 flex flex-col h-full overflow-hidden min-w-0">
             
-            <header class="flex items-center justify-between px-6 py-4 border-b border-slate-800/60 bg-slate-900/40">
+            <header class="flex items-center justify-between px-4 md:px-6 py-3.5 border-b border-slate-800/50 bg-slate-900/30 backdrop-blur-md">
                 <div class="flex items-center space-x-3">
-                    <button onclick="toggleSidebar()" class="md:hidden p-1 text-slate-400 hover:text-slate-200 cursor-pointer z-10">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
+                    <button onclick="toggleSidebar()" class="md:hidden p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 rounded-lg transition-colors cursor-pointer">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
                     </button>
-                    <div class="w-3 h-3 rounded-full bg-blue-500 shadow-[0_0_12px_rgba(59,130,246,0.6)]"></div>
-                    <h1 class="text-lg font-semibold tracking-wide text-slate-200">DeepSeek <span class="text-blue-400 font-light">NeoChat</span></h1>
+                    <div class="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.8)]"></div>
+                    <h1 class="text-sm md:text-base font-semibold tracking-wide text-slate-200">DeepSeek <span class="text-blue-400 font-light font-mono text-xs">NeoChat Pro</span></h1>
                 </div>
                 
-                <div class="relative flex items-center">
-                    <input type="password" id="apiKey" placeholder="输入 DeepSeek API Key" 
-                           class="w-40 md:w-64 px-4 py-1.5 text-xs bg-slate-950/60 border border-slate-800 rounded-lg text-slate-300 placeholder-slate-600 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/30 transition-all"
+                <div class="flex items-center space-x-2">
+                    <select id="modelSelect" class="px-2 py-1.5 text-[11px] font-medium bg-slate-950 border border-slate-800 rounded-lg text-slate-300 focus:outline-none focus:border-blue-500/60 transition-all cursor-pointer">
+                        <option value="deepseek-chat" selected>DeepSeek-V3 (常规对话)</option>
+                        <option value="deepseek-reasoning">DeepSeek-R1 (深度思考)</option>
+                    </select>
+                    <input type="password" id="apiKey" placeholder="API Key" 
+                           class="w-24 md:w-44 px-3 py-1.5 text-[11px] font-mono bg-slate-950/80 border border-slate-800 rounded-lg text-slate-300 placeholder-slate-600 focus:outline-none focus:border-blue-500/50 transition-all"
                            onchange="saveApiKey()" />
                 </div>
             </header>
 
-            <main id="chatMessages" class="flex-1 p-6 overflow-y-auto space-y-6 custom-scrollbar bg-slate-900/10">
+            <div id="tokenStatusBar" class="hidden px-6 py-1 bg-blue-950/20 border-b border-blue-900/20 text-[10px] text-blue-400 font-mono tracking-wide flex justify-between">
+                <span>当前聊天状态: 多轮记忆已载入</span>
+                <span id="sessionTokenCount">消耗统计: 0 tokens</span>
+            </div>
+
+            <main id="chatMessages" class="flex-1 p-4 md:p-6 overflow-y-auto space-y-6 custom-scrollbar bg-slate-950/10 select-text">
                 </main>
 
-            <footer class="p-4 md:p-6 border-t border-slate-800/60 bg-slate-900/30">
-                <div class="max-w-3xl mx-auto relative flex items-end bg-slate-950/50 border border-slate-800/80 rounded-xl px-4 py-3 focus-within:border-blue-500/50 focus-within:ring-1 focus-within:ring-blue-500/20 transition-all shadow-inner">
-                    <textarea id="userInput" placeholder="问点什么吧... (Enter 发送, Shift+Enter 换行)" rows="1"
+            <footer class="p-4 border-t border-slate-800/40 bg-slate-900/20 backdrop-blur-sm">
+                <div class="max-w-4xl mx-auto relative flex items-end bg-slate-950/60 border border-slate-800/80 rounded-xl px-4 py-3 focus-within:border-blue-500/40 focus-within:ring-1 focus-within:ring-blue-500/10 transition-all shadow-inner">
+                    <textarea id="userInput" placeholder="输入消息... (Enter发送，Shift+Enter换行)" rows="1"
                               class="flex-1 bg-transparent border-none outline-none resize-none text-sm text-slate-200 placeholder-slate-500 max-h-32 custom-scrollbar pr-12 py-1"
                               oninput="autoResize(this)"></textarea>
                     
                     <button id="sendBtn" onclick="sendMessage()" 
-                            class="absolute right-3 bottom-3 p-2 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-800 text-white disabled:text-slate-600 rounded-lg transition-colors shadow-lg shadow-blue-900/20 cursor-pointer disabled:cursor-not-allowed">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19l9-2-9-18-9 18 9-2zm0 0v-8" />
-                        </svg>
+                            class="absolute right-2.5 bottom-2.5 p-2 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-900 text-white disabled:text-slate-600 rounded-lg transition-all shadow-md cursor-pointer disabled:cursor-not-allowed">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 transform rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19l9-2-9-18-9 18 9-2zm0 0v-8" /></svg>
                     </button>
                 </div>
-                <div class="text-center text-[10px] text-slate-600 mt-2 tracking-wide">由 DeepSeek API 提供强力驱动 | 数据纯本地安全存储</div>
+                <div class="text-center text-[9px] text-slate-600 mt-2.5 tracking-wider">数据纯本地加密存储 | 完美支持流式输出与 Markdown 渲染</div>
             </footer>
         </div>
     </div>
 
-    <div id="sidebarOverlay" onclick="toggleSidebar()" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-40"></div>
+    <div id="sidebarOverlay" onclick="toggleSidebar()" class="hidden fixed inset-0 bg-black/60 backdrop-blur-xs z-40 transition-opacity"></div>
 
     <script>
         const chatMessages = document.getElementById('chatMessages');
         const userInput = document.getElementById('userInput');
         const sendBtn = document.getElementById('sendBtn');
         const apiKeyInput = document.getElementById('apiKey');
+        const modelSelect = document.getElementById('modelSelect');
         const sessionList = document.getElementById('sessionList');
         const sidebar = document.getElementById('sidebar');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const tokenStatusBar = document.getElementById('tokenStatusBar');
+        const sessionTokenCount = document.getElementById('sessionTokenCount');
+        const globalTokenBadge = document.getElementById('globalTokenBadge');
 
-        // 初始化会话对象
         let sessions = {}; 
         let currentSessionId = '';
 
-        // 配置 Marked 支持同步流式实时渲染高亮
+        // 高级配置：结合 Markdown 解析和实时代码块高亮
         marked.setOptions({
             highlight: function(code, lang) {
                 if (lang && hljs.getLanguage(lang)) {
@@ -163,299 +148,318 @@
             }
         });
 
-        // 页面加载核心控制
+        // 初始化加载环境
         window.onload = function() {
-            // 1. 读取保存的 API Key
             const savedKey = localStorage.getItem('deepseek_api_key');
             if (savedKey) { apiKeyInput.value = savedKey; }
 
-            // 2. 加载本地存储的聊天记录
-            const savedSessions = localStorage.getItem('neo_chat_sessions');
+            const savedSessions = localStorage.getItem('neo_chat_v3_sessions');
             if (savedSessions) {
-                try {
-                    sessions = JSON.parse(savedSessions) || {};
-                } catch(e) {
-                    sessions = {};
-                }
+                try { sessions = JSON.parse(savedSessions) || {}; } catch(e) { sessions = {}; }
             }
 
-            // 3. 稳健初始化逻辑：检查是否有有效会话
-            const sessionIds = Object.keys(sessions);
-            if (sessionIds.length > 0) {
-                renderSessionList();
-                const lastActiveId = sessionIds.sort((a,b) => (sessions[b].updatedAt || 0) - (sessions[a].updatedAt || 0))[0];
-                switchSession(lastActiveId);
-            } else {
-                // 如果空空如也，强行建立并切入第一个会话，彻底解决空白卡死
-                createNewSession();
+            // 如果本地缓存为空，进行完美预设初始化打样
+            if (Object.keys(sessions).length === 0) {
+                initMockSessions();
             }
+
+            renderSessionList();
+            const sortedIds = Object.keys(sessions).sort((a,b) => (sessions[b].updatedAt || 0) - (sessions[a].updatedAt || 0));
+            switchSession(sortedIds[0]);
         }
 
-        function saveApiKey() {
-            localStorage.setItem('deepseek_api_key', apiKeyInput.value.trim());
-        }
-
-        function autoResize(textarea) {
-            textarea.style.height = 'auto';
-            textarea.style.height = Math.min(textarea.scrollHeight - 8, 128) + 'px';
-        }
-
-        userInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-            }
-        });
-
-        // 手机端侧边栏切换逻辑
-        function toggleSidebar() {
-            const isHidden = sidebar.classList.contains('hidden');
-            if (isHidden) {
-                sidebar.classList.remove('hidden');
-                sidebar.classList.add('fixed', 'left-0', 'top-0', 'z-50', 'flex', 'h-full');
-                sidebarOverlay.classList.remove('hidden');
-            } else {
-                sidebar.classList.add('hidden');
-                sidebar.classList.remove('fixed', 'left-0', 'top-0', 'z-50', 'flex', 'h-full');
-                sidebarOverlay.classList.add('hidden');
-            }
-        }
-
-        // 创建全新对话
-        function createNewSession() {
-            const id = 'session_' + Date.now();
-            sessions[id] = {
-                title: '新的对话',
-                history: [],
+        // 制造精美初始会话数据打样，防止页面空秃
+        function initMockSessions() {
+            const id1 = 'session_mock1';
+            sessions[id1] = {
+                title: '💡 欢迎光临 NeoChat',
+                history: [
+                    { role: 'user', content: '你好，介绍一下这个程序。' },
+                    { role: 'assistant', content: '欢迎使用全新升级的 **DeepSeek NeoChat Pro**！我已为你全面集成了以下核心科技：\n\n1. **多模型无缝切换** (支持 V3 聊天与 R1 深度思考深度思维链)。\n2. **精确 Token 流量监控统计**。\n3. **本地沙盒多轮聊天持久化历史保留**。\n4. **流式极速响应与全高亮 Markdown 引擎**。\n\n请在右上角配置好您的 `API Key`，即可享受极速对话！' }
+                ],
+                tokens: 235,
                 updatedAt: Date.now()
             };
             saveSessionsToStorage();
-            renderSessionList();
-            switchSession(id);
-            
-            // 手机端在建立新对话后，自动收起侧边栏菜单
-            if (!sidebar.classList.contains('hidden') && window.innerWidth < 768) { toggleSidebar(); }
         }
 
-        // 切换到目标对话
+        function saveApiKey() { localStorage.setItem('deepseek_api_key', apiKeyInput.value.trim()); }
+        function autoResize(textarea) { textarea.style.height = 'auto'; textarea.style.height = Math.min(textarea.scrollHeight - 8, 128) + 'px'; }
+
+        // 监听热键发送
+        userInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+        });
+
+        // 强健的手机抽屉开闭逻辑，杜绝 CSS 冲突
+        function toggleSidebar() {
+            const isOpen = sidebar.classList.contains('translate-x-0');
+            if (isOpen) {
+                sidebar.classList.remove('translate-x-0');
+                sidebar.classList.add('-translate-x-full');
+                sidebarOverlay.classList.add('hidden');
+            } else {
+                sidebar.classList.remove('-translate-x-full');
+                sidebar.classList.add('translate-x-0');
+                sidebarOverlay.classList.remove('hidden');
+            }
+        }
+
+        function createNewSession() {
+            const id = 'session_' + Date.now();
+            sessions[id] = { title: '🆕 新的新建会话', history: [], tokens: 0, updatedAt: Date.now() };
+            saveSessionsToStorage();
+            renderSessionList();
+            switchSession(id);
+            if (window.innerWidth < 768) { toggleSidebar(); }
+        }
+
         function switchSession(id) {
             if (!sessions[id]) return;
             currentSessionId = id;
             chatMessages.innerHTML = '';
             
-            // 刷新左侧会话列表的激活高亮 UI 状态
-            document.querySelectorAll('.session-item').forEach(el => {
-                el.classList.remove('bg-slate-800/80', 'text-blue-400');
-                el.classList.add('text-slate-400', 'hover:bg-slate-800/40');
-            });
+            // 更新选中 UI 高亮
+            document.querySelectorAll('.session-item').forEach(el => el.classList.remove('bg-blue-950/50', 'text-blue-400', 'border-l-2', 'border-blue-500'));
             const activeEl = document.getElementById(`el_${id}`);
-            if (activeEl) {
-                activeEl.classList.remove('text-slate-400', 'hover:bg-slate-800/40');
-                activeEl.classList.add('bg-slate-800/80', 'text-blue-400');
+            if (activeEl) activeEl.classList.add('bg-blue-950/50', 'text-blue-400', 'border-l-2', 'border-blue-500');
+
+            // 联动更新 Token 状态监控板
+            const session = sessions[id];
+            if (session.tokens > 0) {
+                tokenStatusBar.classList.remove('hidden');
+                sessionTokenCount.innerText = `累计消耗: ${session.tokens} tokens`;
+            } else {
+                tokenStatusBar.classList.add('hidden');
             }
 
-            // 恢复渲染当前会话的所有历史消息
-            const currentSession = sessions[id];
-            if (!currentSession.history || currentSession.history.length === 0) {
-                // 空会话，展示系统欢迎语
-                const welcomeBubble = createMessageElement('ai');
-                welcomeBubble.innerHTML = `欢迎来到全新升级的对话界面。我已经修复了先前**脚本未定义与空缓存**的故障，并加入了**最近聊天记录**侧边栏。请在右上角配置好 Key 后开启畅聊！`;
-            } else {
-                currentSession.history.forEach(msg => {
+            // 渲染该对话的所有历史记录
+            if(session.history && session.history.length > 0) {
+                session.history.forEach(msg => {
                     const bubble = createMessageElement(msg.role);
                     if (msg.role === 'user') {
                         bubble.innerText = msg.content;
                     } else {
-                        bubble.innerHTML = marked.parse(msg.content);
+                        // 如果有思考过程历史，也一并复原渲染
+                        let finalHTML = "";
+                        if (msg.reasoning) {
+                            finalHTML += `<div class="bg-slate-900/80 text-xs text-slate-400 border-l border-slate-700 px-3 py-2 rounded-lg mb-2"><details open><summary class="cursor-pointer font-medium select-none text-slate-500 mb-1">已结束的深度思考过程</summary><div class="whitespace-pre-wrap font-mono opacity-80">${msg.reasoning}</div></details></div>`;
+                        }
+                        finalHTML += `<div class="markdown-body">${marked.parse(msg.content)}</div>`;
+                        bubble.innerHTML = finalHTML;
                     }
                 });
+                // 对恢复的代码段进行全面二次着色
+                chatMessages.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
+            } else {
+                // 空白新会话展示指引
+                const welcomeBubble = createMessageElement('ai');
+                welcomeBubble.innerHTML = `<div class="markdown-body">这是一个全新的多轮聊天沙盒。您当前选择的模型是 \`${modelSelect.value}\`，在这里发送消息，将自动生成左侧的历史记录。</div>`;
             }
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        // 重新渲染左侧列表
         function renderSessionList() {
             sessionList.innerHTML = '';
             const sortedIds = Object.keys(sessions).sort((a,b) => (sessions[b].updatedAt || 0) - (sessions[a].updatedAt || 0));
-            
+            globalTokenBadge.innerText = `${sortedIds.length} 会话`;
+
             sortedIds.forEach(id => {
                 const session = sessions[id];
                 const item = document.createElement('div');
                 item.id = `el_${id}`;
-                item.className = `session-item group flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-medium cursor-pointer transition-all mb-1 text-slate-400 hover:bg-slate-800/40`;
-                
-                // 会话文本点击项
-                const textContainer = document.createElement('div');
-                textContainer.className = 'flex items-center space-x-2.5 truncate w-full';
-                textContainer.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 flex-shrink-0 text-slate-500 group-hover:text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                    </svg>
-                    <span class="truncate pr-1">${session.title || '新的对话'}</span>
+                item.className = `session-item group flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-medium cursor-pointer transition-all mb-0.5 text-slate-400 hover:bg-slate-900/50 pl-4`;
+                if(id === currentSessionId) item.className += ' bg-blue-950/50 text-blue-400 border-l-2 border-blue-500';
+
+                const textWrap = document.createElement('div');
+                textWrap.className = 'flex items-center space-x-2 truncate w-full';
+                textWrap.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 flex-shrink-0 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+                    <span class="truncate pr-1">${session.title || '无标题对话'}</span>
                 `;
-                textContainer.onclick = () => {
-                    switchSession(id);
-                    if (!sidebar.classList.contains('hidden') && window.innerWidth < 768) { toggleSidebar(); } 
-                };
-                
-                // 悬浮显示的删除按钮（移动端为了方便直接显示，桌面端悬浮显示）
-                const deleteBtn = document.createElement('button');
-                deleteBtn.className = 'md:opacity-0 group-hover:opacity-100 p-0.5 hover:text-rose-400 rounded transition-opacity cursor-pointer z-10';
-                deleteBtn.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-16v1a3 3 0 003 3h10M4 7h16" />
-                    </svg>
-                `;
-                deleteBtn.onclick = (e) => {
-                    e.stopPropagation(); 
-                    if(confirm('确定要删除这段对话吗？')) {
-                        deleteSession(id);
+                textWrap.onclick = () => { switchSession(id); if (window.innerWidth < 768) toggleSidebar(); };
+
+                const delBtn = document.createElement('button');
+                delBtn.className = 'opacity-0 group-hover:opacity-100 p-0.5 hover:text-rose-400 rounded transition-opacity cursor-pointer';
+                delBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-16v1a3 3 0 003 3h10M4 7h16" /></svg>`;
+                delBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    if(confirm('核对：要彻底抹除此段本地聊天历史吗？')) {
+                        delete sessions[id]; saveSessionsToStorage(); renderSessionList();
+                        const remain = Object.keys(sessions);
+                        if(remain.length > 0) { switchSession(remain[0]); } else { createNewSession(); }
                     }
                 };
-                
-                item.appendChild(textContainer);
-                item.appendChild(deleteBtn);
+
+                item.appendChild(textWrap);
+                item.appendChild(delBtn);
                 sessionList.appendChild(item);
             });
         }
 
-        function deleteSession(id) {
-            delete sessions[id];
-            saveSessionsToStorage();
-            renderSessionList();
-            
-            const remainingIds = Object.keys(sessions);
-            if (remainingIds.length > 0) {
-                switchSession(remainingIds[0]);
-            } else {
-                createNewSession();
-            }
-        }
-
-        function saveSessionsToStorage() {
-            localStorage.setItem('neo_chat_sessions', JSON.stringify(sessions));
-        }
+        function saveSessionsToStorage() { localStorage.setItem('neo_chat_v3_sessions', JSON.stringify(sessions)); }
 
         function createMessageElement(role) {
             const wrapper = document.createElement('div');
-            wrapper.className = `flex items-start space-x-4 max-w-3xl ${role === 'user' ? 'ml-auto flex-row-reverse space-x-reverse' : ''}`;
+            wrapper.className = `flex items-start space-x-3.5 max-w-4xl ${role === 'user' ? 'ml-auto flex-row-reverse space-x-reverse' : ''}`;
 
             const avatar = document.createElement('div');
-            avatar.className = `flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center shadow-md font-bold text-xs text-white ${
-                role === 'user' ? 'bg-slate-700' : 'bg-gradient-to-tr from-blue-600 to-indigo-600'
+            avatar.className = `flex-shrink-0 w-7.5 h-7.5 rounded-lg flex items-center justify-center shadow-md font-bold text-[10px] text-white ${
+                role === 'user' ? 'bg-slate-800 border border-slate-700' : 'bg-gradient-to-tr from-blue-600 to-indigo-600'
             }`;
             avatar.innerText = role === 'user' ? 'ME' : 'AI';
 
             const bubble = document.createElement('div');
             bubble.className = role === 'user' 
-                ? 'bg-blue-600 border border-blue-500 text-white rounded-2xl rounded-tr-none px-4 py-3 text-sm shadow-sm leading-relaxed'
-                : 'bg-slate-800/40 border border-slate-800/60 text-slate-200 rounded-2xl rounded-tl-none px-4 py-3 text-sm shadow-sm leading-relaxed markdown-body';
+                ? 'bg-blue-600 border border-blue-500 text-white rounded-2xl rounded-tr-none px-4 py-2.5 text-sm shadow-md leading-relaxed select-text'
+                : 'bg-slate-900/50 border border-slate-800/80 text-slate-200 rounded-2xl rounded-tl-none px-4 py-2.5 text-sm shadow-sm leading-relaxed';
 
             wrapper.appendChild(avatar);
             wrapper.appendChild(bubble);
             chatMessages.appendChild(wrapper);
-            
             return bubble;
         }
 
-        // 发送核心逻辑
+        // 强健的发送与多模型流式双输出解析机制
         async function sendMessage() {
             const text = userInput.value.trim();
             const apiKey = apiKeyInput.value.trim() || localStorage.getItem('deepseek_api_key');
+            const selectedModel = modelSelect.value;
 
             if (!text) return;
-            if (!apiKey) { return alert('请先在顶部配置您的 DeepSeek API Key！'); }
-            if (!currentSessionId || !sessions[currentSessionId]) { createNewSession(); }
+            if (!apiKey) return alert('安全提示：请先在右上角输入框填写您的 DeepSeek API Key！');
+            if (!currentSessionId || !sessions[currentSessionId]) createNewSession();
 
-            // 1. 用户消息上屏
+            // 1. 用户提问动作上屏
             const userBubble = createMessageElement('user');
             userBubble.innerText = text;
             userInput.value = '';
             userInput.style.height = 'auto';
 
-            // 2. 状态锁定并同步更新历史数据
+            // 2. 状态锁定，将对话压入多轮缓存
             sendBtn.disabled = true;
             const currentSession = sessions[currentSessionId];
-            if (!currentSession.history) currentSession.history = [];
-            currentSession.history.push({ role: "user", content: text });
-            
-            // 如果是初始新会话，自动将第一句话裁剪为该会话的历史缩略标题
-            if (currentSession.title === '新的对话') {
-                currentSession.title = text.length > 10 ? text.substring(0, 10) + '...' : text;
+            if(!currentSession.history) currentSession.history = [];
+            currentSession.history.push({ role: 'user', content: text });
+
+            // 智能更新缩略标题
+            if (currentSession.title.includes('新的对话') || currentSession.title.includes('🆕 新的新建会话')) {
+                currentSession.title = text.length > 9 ? text.substring(0, 9) + '...' : text;
                 renderSessionList();
             }
             currentSession.updatedAt = Date.now();
             saveSessionsToStorage();
 
-            // 3. 思考状态占位
+            // 3. 建立 AI 打字缓冲占位
             const aiBubble = createMessageElement('ai');
             aiBubble.innerHTML = `<div class="typing-indicator"><span></span><span></span><span></span></div>`;
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
+            // 分立声明：深度思考文本与最终回复文本容器
+            let accumulatedReasoning = "";
+            let accumulatedContent = "";
+
             try {
-                // 4. 发送流式网络请求
+                // 4. 构建网络请求
                 const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey}`
-                    },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
                     body: JSON.stringify({
-                        model: "deepseek-chat",
+                        model: selectedModel,
                         messages: [
-                            { role: "system", content: "你是一个由 DeepSeek 驱动的高级 AI 助手，能够熟练运用 Markdown 格式和精美的代码块来回答问题。" },
+                            { role: 'system', content: '你是一个高级 AI 助手，精通 Markdown 以及各种程序代码高亮规范。' },
                             ...currentSession.history
                         ],
-                        stream: true
+                        stream: true,
+                        // 开启官方精准 Token 消耗回传统计
+                        stream_options: { include_usage: true }
                     })
                 });
 
                 if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    throw new Error(errorData.error?.message || `HTTP ${response.status}`);
+                    const errErr = await response.json().catch(() => ({}));
+                    throw new Error(errErr.error?.message || `HTTP状态码:${response.status}`);
                 }
 
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder("utf-8");
-                let aiReply = "";
-                aiBubble.innerHTML = ""; 
+                let streamBuffer = "";
 
-                let buffer = ""; 
-
+                // 5. 循环解包 SSE 字符流
                 while (true) {
                     const { done, value } = await reader.read();
                     if (done) break;
 
-                    buffer += decoder.decode(value, { stream: true });
-                    const lines = buffer.split("\n");
-                    buffer = lines.pop(); 
+                    streamBuffer += decoder.decode(value, { stream: true });
+                    const lines = streamBuffer.split("\n");
+                    streamBuffer = lines.pop(); // 缓存零散不完整碎片
 
                     for (const line of lines) {
-                        const cleanedLine = line.replace(/^data: /, "").trim();
-                        if (!cleanedLine || cleanedLine === "[DONE]") continue;
+                        const cleaned = line.replace(/^data: /, "").trim();
+                        if (!cleaned || cleaned === "[DONE]") continue;
 
                         try {
-                            const parsed = JSON.parse(cleanedLine);
-                            const content = parsed.choices[0].delta.content || "";
-                            aiReply += content;
+                            const parsed = JSON.parse(cleaned);
                             
-                            aiBubble.innerHTML = marked.parse(aiReply);
+                            // 优先检测末尾是否携带真实的 usage 报告
+                            if (parsed.usage) {
+                                currentSession.tokens = parsed.usage.total_tokens;
+                                tokenStatusBar.classList.remove('hidden');
+                                sessionTokenCount.innerText = `累计消耗: ${parsed.usage.total_tokens} tokens`;
+                                saveSessionsToStorage();
+                                continue;
+                            }
+
+                            const delta = parsed.choices[0].delta;
+
+                            // 捕获 R1 模型特有的深度思考链 (reasoning_content)
+                            if (delta.reasoning_content) {
+                                accumulatedReasoning += delta.reasoning_content;
+                            }
+                            // 捕获常规文本内容 (content)
+                            if (delta.content) {
+                                accumulatedContent += delta.content;
+                            }
+
+                            // 动态构建双模渲染视窗
+                            let liveHTML = "";
+                            if (accumulatedReasoning) {
+                                liveHTML += `
+                                    <div class="bg-slate-900/60 text-xs text-slate-400 border-l-2 border-blue-500/50 px-3 py-2 rounded-lg mb-3">
+                                        <details open>
+                                            <summary class="cursor-pointer font-semibold select-none text-blue-400/80 mb-1">正在进行深度逻辑思考...</summary>
+                                            <div class="whitespace-pre-wrap font-mono opacity-70 leading-relaxed">${accumulatedReasoning}</div>
+                                        </details>
+                                    </div>`;
+                            }
+                            if (accumulatedContent) {
+                                liveHTML += `<div class="markdown-body">${marked.parse(accumulatedContent)}</div>`;
+                            }
+
+                            aiBubble.innerHTML = liveHTML;
                             chatMessages.scrollTop = chatMessages.scrollHeight;
-                        } catch (e) {}
+
+                        } catch(innerErr) {
+                            // 忽略混流碎片杂音
+                        }
                     }
                 }
 
-                aiBubble.querySelectorAll('pre code').forEach((el) => {
-                    hljs.highlightElement(el);
-                });
+                // 6. 流式传输大功告成，锁定语法高亮色彩
+                aiBubble.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
 
-                currentSession.history.push({ role: "assistant", content: aiReply });
+                // 将整轮多轮对话推回本地沙盒存档
+                currentSession.history.push({ 
+                    role: 'assistant', 
+                    content: accumulatedContent,
+                    reasoning: accumulatedReasoning || undefined 
+                });
                 currentSession.updatedAt = Date.now();
                 saveSessionsToStorage();
 
-            } catch (error) {
-                console.error(error);
-                aiBubble.innerHTML = `<span class="text-rose-400">错误: 无法获取 AI 回复。(${error.message})</span>`;
+            } catch(outerErr) {
+                console.error(outerErr);
+                aiBubble.innerHTML = `<span class="text-rose-400 text-xs font-mono">连接中断或配置错误: ${outerErr.message}</span>`;
             } finally {
                 sendBtn.disabled = false;
                 chatMessages.scrollTop = chatMessages.scrollHeight;
