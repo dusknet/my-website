@@ -141,7 +141,7 @@
 
         let sessions = {}; 
         let currentSessionId = '';
-        let isGenerating = false; // 新增：全局流式锁，防止 confirm 挂起和恶意重复操作
+        let isGenerating = false; 
 
         // 初始化加载环境
         window.onload = function() {
@@ -197,7 +197,7 @@
         }
 
         function createNewSession() {
-            if (isGenerating) return; // 输出时不允许新建会话
+            if (isGenerating) return; 
             const id = 'session_' + Date.now();
             sessions[id] = { title: '🆕 新的新建会话', history: [], tokens: 0, updatedAt: Date.now() };
             saveSessionsToStorage();
@@ -206,8 +206,15 @@
             if (window.innerWidth < 768) { toggleSidebar(); }
         }
 
+        function safeHighlight(element) {
+            // 安全防崩溃保护：确保 hljs 加载完毕后再执行染色
+            if (typeof hljs !== 'undefined') {
+                element.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
+            }
+        }
+
         function switchSession(id) {
-            if (!sessions[id] || isGenerating) return; // 流式输出时上锁防止切会话导致DOM错乱
+            if (!sessions[id] || isGenerating) return; 
             currentSessionId = id;
             chatMessages.innerHTML = '';
             
@@ -237,7 +244,7 @@
                         bubble.innerHTML = finalHTML;
                     }
                 });
-                chatMessages.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
+                safeHighlight(chatMessages);
             } else {
                 const welcomeBubble = createMessageElement('ai');
                 welcomeBubble.innerHTML = `<div class="markdown-body">这是一个全新的多轮聊天沙盒。您当前选择的模型是 \`${modelSelect.value}\`，在这里发送消息，将自动生成左侧的历史记录。</div>`;
@@ -269,19 +276,17 @@
                 delBtn.className = 'opacity-0 group-hover:opacity-100 p-0.5 hover:text-rose-400 rounded transition-opacity cursor-pointer disabled:opacity-0 disabled:cursor-not-allowed';
                 delBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-16v1a3 3 0 003 3h10M4 7h16" /></svg>`;
                 
-                // 状态锁定：输出中禁止点击删除
                 if (isGenerating) delBtn.disabled = true;
 
                 delBtn.onclick = (e) => {
                     e.stopPropagation();
-                    if (isGenerating) return; // 安全门禁
+                    if (isGenerating) return; 
                     if(confirm('核对：要彻底抹除此段本地聊天历史吗？')) {
                         const targetIndex = id;
                         delete sessions[targetIndex]; 
                         saveSessionsToStorage(); 
                         renderSessionList();
                         
-                        // 修复切历史导致的潜在bug逻辑
                         if (targetIndex === currentSessionId) {
                             const remain = Object.keys(sessions);
                             if(remain.length > 0) { switchSession(remain[0]); } else { createNewSession(); }
@@ -318,7 +323,6 @@
             return bubble;
         }
 
-        // 视图渲染层提取封装
         function renderLiveView(bubbleElement, reasoning, content) {
             let liveHTML = "";
             if (reasoning) {
@@ -331,14 +335,12 @@
                     </div>`;
             }
             if (content) {
-                // 兼容最新版 marked 的规范解析
                 liveHTML += `<div class="markdown-body">${marked.parse(content)}</div>`;
             }
             bubbleElement.innerHTML = liveHTML;
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        // 强健的发送与多模型流式双输出解析机制
         async function sendMessage() {
             if (isGenerating) return;
 
@@ -350,16 +352,15 @@
             if (!apiKey) return alert('安全提示：请先在右上角输入框填写您的 DeepSeek API Key！');
             if (!currentSessionId || !sessions[currentSessionId]) createNewSession();
 
-            // 锁定全局生成状态
             isGenerating = true;
             sendBtn.disabled = true;
-            document.querySelectorAll('.session-item button').forEach(b => b.disabled = true); // 隐藏/锁定删除钮
+            document.querySelectorAll('.session-item button').forEach(b => b.disabled = true); 
 
             const userBubble = createMessageElement('user');
             userBubble.innerText = text;
             userInput.value = '';
             userInput.style.height = 'auto';
-            userInput.rows = 1; // 彻底回归重置高度
+            userInput.rows = 1; 
 
             const currentSession = sessions[currentSessionId];
             if(!currentSession.history) currentSession.history = [];
@@ -379,7 +380,7 @@
             let accumulatedReasoning = "";
             let accumulatedContent = "";
             let lastRenderTime = 0;
-            const RENDER_INTERVAL = 80; // 节流阀：控制每 80ms 最多渲染一次 DOM 树，解决高频卡顿
+            const RENDER_INTERVAL = 80; 
 
             try {
                 const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
@@ -432,7 +433,6 @@
                             if (delta.reasoning_content) accumulatedReasoning += delta.reasoning_content;
                             if (delta.content) accumulatedContent += delta.content;
 
-                            // 性能优化：执行时间差计算检测
                             const now = Date.now();
                             if (now - lastRenderTime > RENDER_INTERVAL) {
                                 renderLiveView(aiBubble, accumulatedReasoning, accumulatedContent);
@@ -443,9 +443,8 @@
                     }
                 }
 
-                // 最后一包数据确保渲染完整
                 renderLiveView(aiBubble, accumulatedReasoning, accumulatedContent);
-                aiBubble.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
+                safeHighlight(aiBubble); // 流式完成，安全着色代码块
 
                 currentSession.history.push({ 
                     role: 'assistant', 
@@ -459,10 +458,9 @@
                 console.error(outerErr);
                 aiBubble.innerHTML = `<span class="text-rose-400 text-xs font-mono">连接中断或配置错误: ${outerErr.message}</span>`;
             } finally {
-                // 解锁状态
                 isGenerating = false;
                 sendBtn.disabled = false;
-                renderSessionList(); // 恢复列表删除功能
+                renderSessionList(); 
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
         }
